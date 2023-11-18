@@ -1,5 +1,4 @@
 --------------------------------------------------------------------------Descargar ODOO base-------------------------------------------------------------
-NOI87*ARM63*ODA65*
 git clone --depth 1 --branch 16.0 https://github.com/odoo/odoo.git
 git clone --branch 16.0 git@github.com:odoo/enterprise.git
 
@@ -63,7 +62,7 @@ sh ./reset.sh
 
 -----------------------------------------------------------------------Token--------------------------------------------------------------------
 devodoo
-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
+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
 
 -----------------------------------------------------------------------Correr SQL--------------------------------------------------------------------
 sudo su postgres
