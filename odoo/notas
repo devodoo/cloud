@@ -1,0 +1,269 @@
+--------------------------------------------------------------------------Descargar ODOO base-------------------------------------------------------------
+NOI87*ARM63*ODA65*
+git clone --depth 1 --branch 16.0 https://github.com/odoo/odoo.git
+git clone --branch 16.0 git@github.com:odoo/enterprise.git
+
+git config --global core.fileMode false
+
+--------------------------------------------------------------------------Descargar rama especifica-------------------------------------------------------------
+
+git clone --branch 16.0 git@github.com:axcelere/comex_documents.git
+
+
+------------------------------------------------------------Cambiar pass en BD -------------------------------------------------------------------------
+
+admin $pbkdf2-sha512$25000$ZAyhtNb6v3dOSSnlvNf6Hw$2mzT0DPa4LYS5CmDTRZF2TRjDzgBVkCdaHAihc6ZtdK4ttFMbk6zLAfIYpAEXvIpucK1xWLzAXMcUkn/CgEAug
+3219264923
+
+------------------------------------------------------------------------ODOO SH actialuzar submodules--------------------------------------------------------------------
+Actualizar submodule
+git pull origin main
+git commit -am 'bmya'
+git push
+
+------------------------------------------------------------------------ODOO SH Desasociar submodules submodules--------------------------------------------------------------------
+
+Desasociar submodule
+git submodule deinit subscriptions
+git rm subscriptions
+git commit -am 'subscriptions'
+git push
+
+git pull --recursive-submodule
+rm -rf test
+
+
+git rm -r --cached src/main/Tests/bin
+
+------------------------------------------------------------------------ODOO SH Inicializar submodules submodules--------------------------------------------------------------------
+Inicializar submodule
+Desde la raiz
+git submodule add -b 16.0 git@github.com:axcelere/MercadoLibre.git
+git submodule add -b 16.0 git@github.com:axcelere/MercadoLibre-ARG.git
+git commit -am '[INIT] ML'
+git push
+
+
+pip install -e git+https://bitbucket.org/blueorangegroup/mercadolibre.git#egg=mercadolibre
+
+---------------------------------------------------------------------SASS----------------------------------------------------------------------
+sudo pip3 install libsass==0.12.3
+
+
+--------------------------------------------------------------------Reiniciar Pycharm----------------------------------------------------------
+nano /etc/hosts
+cd /home/ernesto/Documents/Trabajo/Herramientas/IDEA
+sh ./reset.sh
+
+
+127.0.0.1       localhost
+127.0.0.1 www.jetbrains.com
+127.0.0.1 plugins.jetbrains.com
+
+
+-----------------------------------------------------------------------Token--------------------------------------------------------------------
+devodoo
+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
+
+-----------------------------------------------------------------------Correr SQL--------------------------------------------------------------------
+sudo su postgres
+psql name_bd < /directorio
+
+root@home-pc:/home/emato# pg_restore -d qa_mc_ecua -h localhost -U odoo /home/emato/Downloads/qa1.sql
+
+-----------------------------------------------------------------------Configuracion Odoo---------------------------------------------------------------
+Run
+script path /home/ernesto/Documents/Trabajo/Desarrollo/odoo/odoo-14/odoo-server/odoo-bin
+parameter --config=/home/ernesto/Documents/Trabajo/Desarrollo/odoo/odoo-14/odoo-server.conf
+
+Run-update
+--config=/etc/odoo-server.conf -d rrhhc786 -u theme_default --stop-after-init
+
+sudo /etc/init.d/odoo start
+
+
+-------------------------------------------------------------------cargar bd con ---------------------------------------------------------------------------------------------
+PGPASSWORD="${RESTORE_DB_PWD}" /usr/bin/psql --username="${RESTORE_DB_USER}" --host="${RESTORE_DB_HOST}" --port=5432 --dbname="template1" --command="create database ${db}"
+ 
+PGPASSWORD="${RESTORE_DB_PWD}" /usr/bin/psql --username="${RESTORE_DB_USER}" --host="${RESTORE_DB_HOST}" --port=5432 --file="${db}/dump.sql" --dbname="${db}"
+
+
+PGPASSWORD=Sistemas1 /usr/bin/psql --username=odoo --host=localhost --port=5432 --dbname="template1" --command="create database o10_expendio_copy"
+PGPASSWORD=Sistemas1 /usr/bin/psql --file=/home/sisinfo/tmp/dump.sql --username=odoo --host=localhost --port=5432 o10_expendio_copy
+
+
+psql -d igalfer -h localhost -U odoo
+\i '/home/ernesto/Downloads/igalfer-qa/dump.sql'
+
+
+-------------------------------------------------------------------actualizar bd---------------------------------------------------
+odoo-bin -u all --stop-after-init
+odoosh-restart
+
+--------------------------------------------------------------------Remove .pyc files from Git remote repository---------------------------------
+git rm -f *.pyc
+git commit -a -m 'all pyc files removed'
+git push
+
+-------------------------------------------------------------------yext-------------------------------------------------------------------------
+account yext 3142360
+DELETE FROM public.account_account_tag_account_move_line_rel;
+
+----------------------------------------------------------------UPS---------------------------------------------------------------------
+****DONAFRE SRL DE CV 5338V1 (COD)**** 
+USERID: donafre.API
+PASS: Greetings@01
+Access Key: DDAE649E8E997D75
+
+
+****DONAFRE SRL DE CV 53VF75 (P/P)**** 
+USERID:donafre.API
+PASS: Greetings@01
+Access Key: 2DAF2B252A01A21A
+
+------------------------------------------------------------Credenciales Guru------------------------------------
+
+Test
+Indexador
+guru.client_id_credential	odoo-guru
+​guru.client_secret_credential	ZxLvjIau5nYNEEbdFT2ia03UrpSzCCiV
+​guru.endpoint_get_token_url	https://keycloak-eks.nlocal.net/auth/realms/Comunidad/protocol/openid-connect/token
+​guru.grant_type_credential	client_credentials
+​guru.webhook_url	        https://odoo-webhook-eks.nlocal.net/notifications
+
+Plataformas
+Chat
+Id de cliente	a0982f4cfc6a5059be2cfa16a0be7f21
+Cliente secreto	39bf5d159474bba2b1c1ac67f375ae57
+
+TG
+Usuario	vg
+Contraseña	vgtest
+API-KEY	525ce678-ec03-42a8-b41c-32dffd8940bc
+
+Yext
+Cuenta	2699740
+API-KEY	2463c41e2fac95e6102d568451827581
+
+Duda
+Usuario	cde91cb418
+Contraseña	xtzMmq
+
+
+
+---------------------------------------------------------------AUdio PC---------------------------------------------------------
+$ sudo apt reinstall pulseaudio
+echo "options snd-hda-intel dmic_detect=0" | sudo tee -a /etc/modprobe.d/alsa-base.conf
+
+sudo reboot
+
+aws-cloud-technical-essentials
+
+
+pip install pdf417gen
+
+---------------------------------------------------------Own Token ------------------------------------------------------------
+
+
+
+
+python3 ../manage.py startapp authenticate
+select setval('guru_pacom_id_seq'::regclass, (select MAX(id)+1 FROM guru_pacom));
+
+DELETE FROM public.account_account_tag_account_move_line_rel;
+
+select setval('guru_pacom_id_seq'::regclass, (select MAX(id)+1 FROM guru_pacom));
+select setval('guru_general_geo_id_seq'::regclass, (select MAX(id)+1 FROM guru_general_geo));
+select setval('guru_geo_id_seq'::regclass, (select MAX(id)+1 FROM guru_geo));
+select setval('guru_facebook_ads_id_seq'::regclass, (select MAX(id)+1 FROM guru_facebook_ads));
+select setval('guru_google_ads_id_seq'::regclass, (select MAX(id)+1 FROM guru_google_ads));
+select setval('guru_sponsorships_id_seq'::regclass, (select MAX(id)+1 FROM guru_sponsorships));
+select setval('res_partner_id_seq'::regclass, (select MAX(id)+1 FROM res_partner));
+select setval('account_move_id_seq'::regclass, (select MAX(id)+1 FROM account_move));
+select setval('account_move_line_id_seq'::regclass, (select MAX(id)+1 FROM account_move_line));
+select setval('guru_traffic_id_seq'::regclass, (select MAX(id)+1 FROM guru_traffic));
+select setval('guru_web_id_seq'::regclass, (select MAX(id)+1 FROM guru_web));
+select setval('guru_category_line_id_seq'::regclass, (select MAX(id)+1 FROM guru_category_line));
+select setval('guru_pacom_phone_id_seq'::regclass, (select MAX(id)+1 FROM guru_pacom_phone));
+select setval('guru_pacom_schedule_id_seq'::regclass, (select MAX(id)+1 FROM guru_pacom_schedule));
+select setval('res_partner_id_seq'::regclass, (select MAX(id)+1 FROM res_partner));
+select setval('mail_followers_id_seq'::regclass, (select MAX(id)+1 FROM mail_followers));
+select setval('guru_pacom_branches_id_seq'::regclass, (select MAX(id)+1 FROM guru_pacom_branches));
+select setval('guru_pacom_general_branches_id_seq'::regclass, (select MAX(id)+1 FROM guru_pacom_general_branches));
+select setval('guru_chat_bot_id_seq'::regclass, (select MAX(id)+1 FROM guru_chat_bot));
+select setval('mail_message_id_seq'::regclass, (select MAX(id)+1 FROM mail_message));
+select setval('project_task_id_seq'::regclass, (select MAX(id)+1 FROM project_task));
+select setval('mail_activity_id_seq'::regclass, (select MAX(id)+1 FROM mail_activity));
+select setval('project_task_user_rel_id_seq'::regclass, (select MAX(id)+1 FROM project_task_user_rel));
+
+ALTER TABLE product_pricelist_item DROP CONSTRAINT product_pricelist_item_chanel_product_unique;
+
+
+
+UPDATE sale_order as so SET label_generated = False WHERE so.client_order_ref IN ();
+
+----------------------------------------------------------------------oca----------------------------------------------------------------------------
+https://developers.oca.com.ar/epak.html
+centro de costo en 0 
+franja horaria
+origen
+centro de disposion origen en 0
+operativa
+
+
+    
+    
+    
+    -----------------------------------------------------------------------------aws----------------------------------------------------------------------------
+ssh -i EC2Tutorial.pem ec2-user@18.212.1.10
+corregir .pem sudo chmod 600 or 400 /path/to/my/key.pem
+
+
+
+Código	Descripción
+24	Natural Life ML
+18	Catycan ML
+65	Natural Life Web
+64	Catycan Web
+67	Mascotas Online ML
+Matias Alfano15:09
+== BASE ==
+Código	Descripción
+CL	Colecta
+NL	Natural Life
+
+
+5491135634501
+
+-----------------------------------------------------------------Installing postgres---------------------------------------------------------------------------------------------
+#
+# Setup the repository
+#
+
+# Install the public key for the repository (if not done previously):
+sudo curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
+
+# Create the repository configuration file:
+# SEE MODIFICATION BELOW
+sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/jammy pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+
+#
+# Install pgAdmin
+#
+
+# Install for desktop mode only:
+sudo apt install pgadmin4-desktop
+
+
+
+
+https://www.linkedin.com/help/linkedin/answer/a1337823/deshabilitar-temporalmente-la-cuenta?lang=es
+
+
+
+
+
+
+krto-oiuv-ikmi-btvj-gllv
+
+

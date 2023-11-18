@@ -1,0 +1,29 @@
+***********************************************
+Documentation
+***********************************************
+1 Create VPC
+2 Crear sub redes
+2.1 Publica
+2.2 Privada
+
+3 Configuracion de tabla de ruteo
+3.1 Tabla de ruteo para subred publica(Internet gateway)
+3.2 Tabla de ruteopara subred privada
+
+4 Crear RDS
+
+5 Crear Intancia de EC2
+ 1 SO Ubuntu 20.04
+ 2 Familia t2.micro
+ 3 ELB 30GB
+ 4 Security group
+   SSH 22, HTTP 80, HTTPS 443, ICMPC 0 - 65535, Odoo 8069
+
+6 Creación de par de llaves
+7 Asignacion de Elastic IP
+8 Configuración de dominio Router 53
+
+    
+
+
+

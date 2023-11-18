@@ -1,0 +1,252 @@
+--------------------------------------------------------------------------Docker Images-------------------------------------------------------------
+sudo usermod -aG docker ernesto
+docker biuld .
+docker build -t ubuntu:3.0 .
+sudo systemctl is-active docker
+
+docker login
+docker tag ubuntu:3.0 emato880520/helloworld:1.0
+docker push emato880520/helloworld:1.0
+docker pull emato880520/helloworld:latest
+docker create --name test01 emato880520/helloworld:latest
+
+Crear imagenes desde contenedor
+docker commit test01 webserver:1.0
+
+docker save ubuntu:4.0 -o mi_imagen
+
+
+------------------------------------------------------------------------Container------------------------------------------------------------------
+
+docker create --name webserver  -p 8080:80 -d ubuntu:1.0
+docker create --name webserver  -p 8080:80 --restart always -d ubuntu:1.0
+docker update --restart always container
+docker run -p 8080:80 --name webserver ubuntu:3.0
+docker run -P --name webserver ubuntu:3.0
+
+docker run -it ubuntu:2.0 /bin/bash
+docker exec -it webserver bash
+
+docker cp container:/usr/share/nginex/html/index.html /tmp/index.html
+docker port web02
+docker rename web02 web01
+
+Exportar un contenedor y despues importarlo y usarlo como imagen
+docker export -o test01.file container
+docker import test01.file myimg:5.0
+
+Diferencia en el contenedor con respecto a la IMG
+docker diff container
+
+Ver los procesos del container
+docker top container 
+
+-------------------------------------------------------------------------Volumen--------------------------------------------------------------
+docker volume list
+docker volume create myvolume
+docker volume inspect myvolume
+docker volume prune (Remove volume without use)
+docker volume rm myvolume
+
+
+docker create --mount source=myvolume,target=/app --name web01 ubuntu:3.0
+docker create -v myvolume:/app --name web02 ubuntu:3.0
+
+Ver lo volumenes
+cd /var/lib/docker/volumes/myvolume/_data/
+
+--------------------------------------------------------Network------------------------------------------------------------------------------------------
+
+docker network ls
+docker network create --driver bridge web01
+docker inspect web01
+docker create --name web01 --network web01 ubuntu:3.0
+docker network rm web01
+
+--------------------------------------------------------------------ENV---------------------------------------------------------------
+docker create -e db_endpoint=db.midominio.local -e db_user=user -e db_password=pw --name web01 emato880520/helloworld:latest
+
+
+-------------------------------------------------------------------Compose----------------------------------------------------
+docker compose up
+docker compose up -d
+docker compose exec redis bash
+docker compose kill redis
+docker compose start redis
+docker compose stop redis
+docker compose pause redis
+docker compose unpause redis
+ocker compose run redis ls /
+----------------------------------------------------------------------General info------------------------------------------------------------------------
+Entrar a la pc
+
+
+Info de pc
+apt install procps
+ps aux
+tail -f nginx/access.log
+docker exec webserver "ls"
+docker exec webserver bash -c "sleep 10"
+ls -lh
+
+docker logs -f test
+docker inspect ubuntu:3.0
+docker attach container
+
+Puertos aleatorios de linux
+cat /proc/sys/net/ipv4/ip_local_port_range 
+
+
+Mapeos de puertos en docker
+ps aux |grep proxy
+
+
+---------------------------------------------------------------Kubernetes-----------------------------------------------------------------------
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+minikube start --kubernetes-version=v1.22.6
+
+cd  .kube
+cd .minikube/
+
+Install dasboard
+minikube addons list
+minikube addons enable dashboard
+minikube addons enable metrics-server
+
+
+minikube config set cpus 2
+minikube config set memory 4000
+minikube profile list
+
+minikube start
+minikube status
+minikube ip
+minikube stop
+minikube delete
+minikube ssh
+minikube config
+minikube config set kubernetes-version v1.28.2
+
+Borra el directorio minikube
+rm -rf .minikube/
+
+
+kubectl get nodes
+
+minikube start -p cluster1
+minikube start -p cluster2 --kubernetes-version=1.27.0
+
+minikube delete -p cluster1
+
+Descargar cluster2
+
+alias k1="minikube -p cluster2 kubectl"
+minikube -p cluster2 kubectl get nodes
+kubectl get nodes
+
+Listar objetos con epsacios de nombre permite aislar recursos
+kubectl get all
+kubectl get all -o wide
+kubectl get ns (namespaces)
+
+
+Desplegar el manifest (Declarativa)
+kubectl apply -f ejemplo.yaml
+kubectl delete -f example.yaml
+
+kubectl apply -f ejemplo.yaml
+Imperativa
+kubectl create deployment --image=nginx:latest --replicas=2 test
+kubectl delete deployment test
+
+
+PODS
+
+kubectl delete -f pod.yaml
+
+kubectl get pods --show-labels
+kubectl get pods --selector project=pagina_web
+
+Return obj with tag environment consulta 
+kubectl get pods --show-labels -l environment
+
+kubectl get pods -o wide
+kubectl get pods --show-labels
+kubectl describe pods nginx-ddrwz
+
+
+kubectl exec nginx ls 
+ OR multiples se especifica el nombre
+kubectl exec -c nginx ls
+
+kubectl -it exec -c nginx bash
+Salidas de cambio
+kubectl get pods -w
+
+Replications
+kubectl get rc
+kubectl describe rc nginx
+
+Cambiar nur replicas sin cambiar el archivo yml
+kubectl scale rc nging --replicas=1
+
+Elimina todo
+kubectl delete -f .
+
+Elimina uno a uno
+kubectl delete -f rc.yml
+
+Evitar tiempo de espera cuando eliminas 
+kubectl delete pods --all --force --grace-period=0
+
+Set
+kubectl get rs
+
+NS
+kubectl create ns myspace
+kubectl get all -n kube-system
+
+Saber structura de ns
+kubectl create ns myspace --dry-run=client
+
+kubectl apply -f pod.yaml -n miespacio
+
+Ver los pod en ns
+kubectl get pods -A
+
+kubectl delete ns mispacio
+
+Crear ns y pods a la vez
+kubectl apply -f ns.yml -f pod.yml
+kubectl apply -f .
+
+Servicess
+
+kubectl expose rs landingpage --port 80
+kubectl delete svc landingpage
+kubectl expose rs landingpage --port 80 --dry-run=client -o yaml
+kubectl expose rs landingpage --port 80 --dry-run=client -o yaml > svc.yaml
+
+reneombrar file
+mv file2 file2
+
+minikube ip
+
+Deploy
+kubectl --dry-run=client -o yaml create deploy --image=odoo:latest odoo-deploy > deploy.yaml
+
+Ver revision
+kubectl rollout history deployment nginx-deployment
+kubectl rollout history deployment nginx-deployment --revision=1
+
+Regresar a una revision
+kubectl rollout undo deployment nginx-deployment --torevision=2
+
+kubectl set image deployment nginx-deployment nginx(container name)=nginx:1.2.1
+Show the current state
+kubectl rollout staus deployment nginx-deployment 
+
+
+
+

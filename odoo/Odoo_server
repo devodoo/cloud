@@ -1,0 +1,242 @@
+***********************************************
+Documentation
+***********************************************
+https://www.odoo.com/documentation/14.0/setup/install.html
+https://www.candidroot.com/blog/our-candidroot-blog-1/post/how-to-install-odoo-14-on-ubuntu-18-04-66
+https://www.odoo.com/documentation/14.0/setup/deploy.html
+https://www.rosehosting.com/blog/how-to-install-odoo-14-on-centos-8-with-nginx-as-a-reverse-proxy/
+https://linuxize.com/post/how-to-install-odoo-14-on-ubuntu-20-04/
+
+
+
+***********************************************
+GENERAL
+***********************************************
+sudo apt-get update
+sudo apt install git python3-pip build-essential wget python3-dev python3-venv \
+    python3-wheel libfreetype6-dev libxml2-dev libzip-dev libldap2-dev libsasl2-dev \
+    python3-setuptools node-less libjpeg-dev zlib1g-dev libpq-dev \
+    libxslt1-dev libldap2-dev libtiff5-dev libjpeg8-dev libopenjp2-7-dev \
+    liblcms2-dev libwebp-dev libharfbuzz-dev libfribidi-dev libxcb1-dev
+    
+sudo apt-get install zip
+sudo apt-get install xfonts-75dpi
+
+
+***********************************************
+Installing and Configuring PostgreSQL
+***********************************************
+sudo apt install postgresql -y
+sudo apt-get install postgresql-client
+sudo apt-get install postgresql-client-common
+sudo su - postgres -c "createuser -s odoo16"
+
+#Creating a System User
+-not create directory start (home) the user
+sudo useradd -m -d /opt/odoo16 -U -r -s /bin/bash odoo16
+
+
+
+***********************************************
+Installing wkhtmltopdf
+***********************************************
+sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
+sudo dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb
+sudo apt-get -f install
+
+Problem with library libssl1.1_1.1.1
+
+wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+
+
+
+***********************************************
+Install ODOO second way
+***********************************************
+sudo su - odoo16
+git clone https://www.github.com/odoo/odoo --depth 1 --branch 16.0 /opt/odoo16/odoo
+cd /opt/odoo16
+python3 -m venv odoo-venv
+source odoo-venv/bin/activate
+
+pip3 install xlwt
+pip3 install num2words
+pip3 install wheel
+pip3 install -r odoo/requirements.txt
+pip3 install responses
+
+----Deactivate env
+deactivate
+
+If error with psycopg2 run the command 
+sudo apt-get install libpq-dev
+
+deactivate
+mkdir /opt/odoo16/custom_addons
+
+Create odoo.conf
+echo > odoo16.conf
+sudo nano /etc/odoo16.conf
+sudo chown odoo16:odoo16 odoo-server.conf
+
+[options]
+; This is the password that allows database operations:
+admin_passwd = admin23
+db_host = False
+db_port = False
+db_user = False
+db_password = False
+addons_path = /opt/odoo16/odoo/addons,/opt/odoo16/custom_addons
+default_productivity_apps = True
+
+dbfilter = 
+http_enable = True
+http_interface = 127.0.0.1
+http_port = 8069
+list_db = True
+logfile = /var/log/odoo/odoo-server.log
+longpolling_port = 8072
+netrpc_interface = 127.0.0.1
+proxy_mode = True
+workers = 4
+
+
+
+*********************************************************
+Creating Systemd Unit File
+********************************************************
+cd /etc/systemd/system
+echo > odoo16.service
+sudo nano /etc/systemd/system/odoo16.service
+
+[Unit]
+Description=Odoo16
+Requires=postgresql.service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+SyslogIdentifier=odoo16
+PermissionsStartOnly=true
+User=odoo16
+Group=odoo16
+ExecStart=/opt/odoo16/odoo-venv/bin/python3 /opt/odoo16/odoo/odoo-bin -c /etc/odoo16.conf
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now odoo16
+************************************************************************************************************************************************************************************************************
+
+
+******************************************************************
+Conect Database
+******************************************************************
+Debemos darle permiso al grupo de la bd para tener acceso y tenga anywhere 0.0.0.0/0
+psql -h endponit -p 5432 -U postgres
+CREATE DATABASE Odoo16
+CREATE USER odoo16 WITH PASSWORD 'odoo16' CREATEDB;
+\q
+
+******************************************************************
+CHANGE ODOO CONF
+******************************************************************
+New endpont user and pass
+sudo systemctl restart odoo16
+
+
+******************************************************************
+INSTALLING NGINX
+******************************************************************
+sudo apt-get install nginx
+
+cd /etc/nginx/sites-available
+
+sudo nano odoo16
+
+# Odoo Upstreams
+upstream odooserver {
+     server 127.0.0.1:8069;
+}
+
+upstream odoochat {
+    server 127.0.0.1:8072;
+}
+
+# http to https redirection
+# HTTP -> HTTPS
+server {
+  listen 80;
+  server_name prodevsoft.com www.prodevsoft.com;
+  rewrite ^(.*) https://$host$1 permanent;
+}
+
+server {
+    listen 80;    
+    server_name prodevsoft.com www.prodevsoft.com;
+    access_log /var/log/nginx/odoo_access.log;
+    error_log /var/log/nginx/odoo_error.log;
+     
+    # Proxy settings
+    proxy_read_timeout 720s;
+    proxy_connect_timeout 720s;
+    proxy_send_timeout 720s;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    # Redirect longpoll requests to odoo longpolling port
+     location /longpolling {
+        proxy_pass http://odoochat;
+     }
+     
+    # Request for root domain
+    location / {
+       proxy_redirect off;
+       proxy_pass http://odooserver;
+    }
+
+    # Cache static files
+    location ~* /web/static/ {
+        proxy_cache_valid 200 90m;
+        proxy_buffering on;
+        expires 864000;
+        proxy_pass http://odooserver;
+    }
+
+    # Gzip Compression
+    gzip_types text/css text/less text/plain text/xml application/xml application/json application/javascript;
+    gzip on;
+
+    #ssl_certificate /etc/letsencrypt/live/hr.credito786.us/fullchain.pem; # managed by Certbot
+    #ssl_certificate_key /etc/letsencrypt/live/hr.credito786.us/privkey.pem; # managed by Certbot
+}
+
+
+sudo ln -s /etc/nginx/sites-available/odoo16 /etc/nginx/sites-enabled/
+sudo fuser -k 80/tcp
+nginx -t
+
+------------------------------------
+Crbot configuration
+
+
+
+sudo systemctl restart nginx
+sudo systemctl status odoo16
+sudo systemctl restart odoo16
+
+
+
+sudo nginx reload
+sudo nano etc/odoo/odoo.conf
+sudo service odoo restart
+
+
+
+

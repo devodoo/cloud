@@ -1,0 +1,113 @@
+https://www.odoo.com/documentation/14.0/setup/install.html
+https://www.candidroot.com/blog/our-candidroot-blog-1/post/how-to-install-odoo-14-on-ubuntu-18-04-66
+https://www.odoo.com/documentation/14.0/setup/deploy.html
+https://www.rosehosting.com/blog/how-to-install-odoo-14-on-centos-8-with-nginx-as-a-reverse-proxy/
+https://linuxize.com/post/how-to-install-odoo-14-on-ubuntu-20-04/
+
+sudo apt install postgresql -y
+wget -O - https://nightly.odoo.com/odoo.key | apt-key add -
+echo "deb http://nightly.odoo.com/16.0/nightly/deb/ ./" >> /etc/apt/sources.list.d/odoo.list
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DEF2A2198183CBB5
+apt-get update
+apt install python3-pip
+sudo pip3 install xlwt
+sudo pip3 install num2words
+sudo apt-get install xfonts-75dpi
+sudo wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
+sudo dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb
+sudo cp /usr/local/bin/wkhtmltoimage /usr/bin/wkhtmltoimage
+sudo cp /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf
+apt-get install odoo
+
+
+
+sudo apt-get install git
+sudo apt-get install zip
+sudo apt-get install unzip
+sudo apt-get install nginx
+cd /etc/nginx/sites-available
+
+sudo nano odoo
+
+# Odoo Upstreams
+upstream odooserver {
+     server 127.0.0.1:8069;
+}
+
+upstream odoochat {
+    server 127.0.0.1:8072;
+}
+
+# http to https redirection
+# HTTP -> HTTPS
+
+server {
+    listen 80;    
+    server_name 74.208.119.111;
+    access_log /var/log/nginx/odoo_access.log;
+    error_log /var/log/nginx/odoo_error.log;
+     
+    # Proxy settings
+    proxy_read_timeout 720s;
+    proxy_connect_timeout 720s;
+    proxy_send_timeout 720s;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    # Redirect longpoll requests to odoo longpolling port
+     location /longpolling {
+        proxy_pass http://odoochat;
+     }
+     
+    # Request for root domain
+    location / {
+       proxy_redirect off;
+       proxy_pass http://odooserver;
+    }
+
+    # Cache static files
+    location ~* /web/static/ {
+        proxy_cache_valid 200 90m;
+        proxy_buffering on;
+        expires 864000;
+        proxy_pass http://odooserver;
+    }
+
+    # Gzip Compression
+    gzip_types text/css text/less text/plain text/xml application/xml application/json application/javascript;
+    gzip on;
+
+    #ssl_certificate /etc/letsencrypt/live/hr.credito786.us/fullchain.pem; # managed by Certbot
+    #ssl_certificate_key /etc/letsencrypt/live/hr.credito786.us/privkey.pem; # managed by Certbot
+}
+
+sudo ln -s /etc/nginx/sites-available/odoo /etc/nginx/sites-enabled/
+sudo nginx reload
+
+sudo nano etc/odoo/odoo.conf
+
+[options]
+; This is the password that allows database operations:
+; admin_passwd = admin
+db_host = False
+db_port = False
+db_user = False
+db_password = False
+;addons_path = /usr/lib/python3/dist-packages/odoo/addons
+;default_productivity_apps = True
+
+dbfilter = 
+http_enable = True
+http_interface = 127.0.0.1
+http_port = 8069
+list_db = True
+logfile = /var/log/odoo/odoo-server.log
+longpolling_port = 8072
+netrpc_interface = 127.0.0.1
+proxy_mode = True
+workers = 4
+
+
+sudo service odoo restart
